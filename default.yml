@@ -77,25 +77,25 @@ metrics:
 
   # 以rds mysql版监控项为参考
   acs_rds_dashboard:
-    - name: ConnectionUsage        # 连接数使用率
-    - name: CpuUsage
-    - name: MemoryUsage
-    - name: DiskUsage
-    - name: MySQL_DataDiskSize     # 数据磁盘使用量，单位MB
-    - name: DataDelay              # 只读实例延迟，单位秒
-    - name: IOPSUsage              # iops使用率
-    - name: MySQL_ActiveSessions   # Session数量
-    - name: MySQL_ThreadsConnected # 线程连接数
-    - name: MySQL_ThreadsRunning   # 活跃线程数
-    - name: MySQL_SlowQueries      # 每秒慢查询量
-    - name: MySQL_TPS              # 每秒事务数
-    - name: MySQL_QPS              # 每秒查询量
-    - name: MySQL_NetworkInNew     # 入网带宽
-    - name: MySQL_NetworkOutNew    # 出网带宽
-    - name: MySQL_IbufRequestR     # 每秒逻辑读次数
-    - name: MySQL_IbufRequestW     # 每秒逻辑写次数
-    - name: MySQL_IbufDirtyRatio   # BP脏页百分率
-    - name: MySQL_IbufReadHit      # BP读命中率
+    - name: ConnectionUsage        # 连接数使用率 %
+    - name: CpuUsage               # CPU使用率 %
+    - name: MemoryUsage            # 内存使用率 %
+    - name: DiskUsage              # 磁盘使用率 %
+    - name: MySQL_DataDiskSize     # 数据磁盘使用量 MB
+    - name: DataDelay              # 只读实例延迟 Second
+    - name: IOPSUsage              # iops使用率 %
+    - name: MySQL_ActiveSessions   # Session数量 Count
+    - name: MySQL_ThreadsConnected # 线程连接数 Count
+    - name: MySQL_ThreadsRunning   # 活跃线程数 Count
+    - name: MySQL_SlowQueries      # 每秒慢查询量 CountSecond
+    - name: MySQL_TPS              # 每秒事务数 CountSecond
+    - name: MySQL_QPS              # 每秒查询量 CountSecond
+    - name: MySQL_NetworkInNew     # 入网带宽 bit/s
+    - name: MySQL_NetworkOutNew    # 出网带宽 bit/s
+    - name: MySQL_IbufRequestR     # 每秒逻辑读次数 CountSecond
+    - name: MySQL_IbufRequestW     # 每秒逻辑写次数 CountSecond
+    - name: MySQL_IbufDirtyRatio   # BP脏页百分率 %
+    - name: MySQL_IbufReadHit      # BP读命中率 %
 
   # 以标准版redis监控项为参考
   acs_kvstore:
@@ -133,8 +133,10 @@ metrics:
     - name: MaxConnection                      # 端口并发连接数 Count/Second
     - name: NewConnection                      # TCP新建连接数 Count
     - name: Qps                                # 七层监听QPS Count/s
-    - name: TrafficRXNew                       # 流入带宽
-    - name: TrafficTXNew                       # 流出带宽
+    - name: TrafficRXNew                       # 流入带宽 bit/s
+    - name: TrafficTXNew                       # 流出带宽 bit/s
+    - name: InstanceTrafficRX                  # 实例每秒入bit数 bit/s
+    - name: InstanceTrafficTX                  # 实例每秒出bit数 bit/s
     - name: HeathyServerCount                  # 健康检查后端健康ECS实例个数 Count
     - name: UnhealthyServerCount               # 后端异常ECS实例个数 Count
     - name: HealthyServerCountWithRule         # 七层转发规则后端健康ECS实例个数 Count
