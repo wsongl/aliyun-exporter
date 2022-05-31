@@ -264,7 +264,7 @@ groups:
   rules:
   - alert: mongodb_CPUUtilization
     expr: |-
-      ops_aliyun_metric_acs_mongodb_CPUUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_es, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 90
+      ops_aliyun_metric_acs_mongodb_CPUUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(imou_aliyun_info_mongo, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 90
     for: 5m
     labels:
       severity: warn
@@ -273,7 +273,7 @@ groups:
 
   - alert: mongodb_MemoryUtilization
     expr: |-
-      ops_aliyun_metric_acs_mongodb_MemoryUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_es, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 90
+      ops_aliyun_metric_acs_mongodb_MemoryUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(imou_aliyun_info_mongo, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 90
     for: 5m
     labels:
       severity: warn
@@ -282,7 +282,7 @@ groups:
 
   - alert: mongodb_ConnectionUtilization
     expr: |-
-      ops_aliyun_metric_acs_mongodb_ConnectionUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_es, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 90
+      ops_aliyun_metric_acs_mongodb_ConnectionUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(imou_aliyun_info_mongo, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 90
     for: 5m
     labels:
       severity: warn
@@ -291,7 +291,7 @@ groups:
 
   - alert: mongodb_DiskUtilization
     expr: |-
-      ops_aliyun_metric_acs_mongodb_DiskUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_es, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 90
+      ops_aliyun_metric_acs_mongodb_DiskUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(imou_aliyun_info_mongo, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 90
     for: 5m
     labels:
       severity: warn
@@ -300,7 +300,7 @@ groups:
 
   - alert: mongodb_IOPSUtilization
     expr: |-
-      ops_aliyun_metric_acs_mongodb_IOPSUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_es, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 90
+      ops_aliyun_metric_acs_mongodb_IOPSUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(imou_aliyun_info_mongo, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 90
     for: 5m
     labels:
       severity: warn
@@ -309,7 +309,7 @@ groups:
 
   - alert: mongodb_ReplicationLag
     expr: |-
-      ops_aliyun_metric_acs_mongodb_ReplicationLag_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_es, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 10
+      ops_aliyun_metric_acs_mongodb_ReplicationLag_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(imou_aliyun_info_mongo, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 10
     for: 5m
     labels:
       severity: warn
