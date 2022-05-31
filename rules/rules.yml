@@ -321,7 +321,7 @@ groups:
   rules:
   - alert: dts_MigrationLatency
     expr: |-
-      ops_aliyun_metric_acs_dts_MigrationLatency_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_dts_sync, "instanceName","$1", "SynchronizationJobName", "(.*)"), "instanceId","$1", "SynchronizationJobId", "(.*)") > 10
+      ops_aliyun_metric_acs_dts_MigrationLatency_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_dts_migrate, "instanceName","$1", "MigrationJobName", "(.*)"), "instanceId","$1", "MigrationJobID", "(.*)") > 10
     for: 5m
     labels:
       severity: warn
