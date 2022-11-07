@@ -1,0 +1,338 @@
+groups:
+- name: slb
+  rules:
+  - alert: slb_UnhealthyServerCount
+    expr: |-
+      ops_aliyun_metric_acs_slb_dashboard_UnhealthyServerCount_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_clb, "instanceId", "$1", "LoadBalancerId", "(.*)"), "instanceName", "$1", "LoadBalancerName", "(.*)" ) > 0
+    for: 3m
+    labels:
+      severity: error
+    annotations:
+      summary: 'SLB: {{ $labels.instanceName }} IP: {{ $labels.vip}} PORT: {{ $labels.port }}，后端异常ECS实例个数大于0，当前值为{{ $value }}.'
+
+  - alert: slb_HeathyServerCount
+    expr: |-
+      ops_aliyun_metric_acs_slb_dashboard_HeathyServerCount_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_clb, "instanceId", "$1", "LoadBalancerId", "(.*)"), "instanceName", "$1", "LoadBalancerName", "(.*)" ) == 0
+    for: 3m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'SLB: {{ $labels.instanceName }} IP: {{ $labels.vip}} PORT: {{ $labels.port }}，健康检查后端健康ECS实例个数为0.请尽快挂载后端服务器.'
+
+  - alert: slb_InstanceQpsUtilization
+    expr: |-
+      ops_aliyun_metric_acs_slb_dashboard_InstanceQpsUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_clb, "instanceId", "$1", "LoadBalancerId", "(.*)"), "instanceName", "$1", "LoadBalancerName", "(.*)" ) > 90
+    for: 3m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'SLB: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId}})，七层实例QPS使用率大于90%，当前值为{{ $value }}%.'
+ 
+  - alert: slb_InstanceMaxConnectionUtilization
+    expr: |-
+      ops_aliyun_metric_acs_slb_dashboard_InstanceMaxConnectionUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_clb, "instanceId", "$1", "LoadBalancerId", "(.*)"), "instanceName", "$1", "LoadBalancerName", "(.*)" ) > 90
+    for: 3m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'SLB: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId}})，实例最大连接数使用率大于90%，当前值为{{ $value }}%.'
+ 
+  - alert: slb_InstanceNewConnectionUtilization
+    expr: |-
+      ops_aliyun_metric_acs_slb_dashboard_InstanceNewConnectionUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_clb, "instanceId", "$1", "LoadBalancerId", "(.*)"), "instanceName", "$1", "LoadBalancerName", "(.*)" ) > 95
+    for: 3m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'SLB: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId}})，实例最新连接数使用率大于95%，当前值为{{ $value }}%.'
+
+  - alert: slb_InstanceTrafficTXUtilization
+    expr: |-
+      ops_aliyun_metric_acs_slb_dashboard_InstanceTrafficTXUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_clb, "instanceId", "$1", "LoadBalancerId", "(.*)"), "instanceName", "$1", "LoadBalancerName", "(.*)" ) > 90
+    for: 3m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'SLB: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId}})，实例网络流出带宽使用率大于90%，当前值为{{ $value }}%.'
+
+
+- name: rds
+  rules:
+  - alert: rds_CpuUsage
+    expr: |-
+      ops_aliyun_metric_acs_rds_dashboard_CpuUsage_Average * on (instanceId) group_left(instanceName,ZoneId) label_replace(label_replace(ops_aliyun_info_rds, "instanceId", "$1", "DBInstanceId", "(.*)"), "instanceName", "$1", "DBInstanceDescription", "(.*)") > 90
+    labels:
+      severity: warn
+    for: 5m
+    annotations:
+      summary: 'RDS: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId }} ZoneId: {{ $labels.ZoneId }}，CPU使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: rds_MemoryUsage
+    expr: |-
+      ops_aliyun_metric_acs_rds_dashboard_MemoryUsage_Average * on (instanceId) group_left(instanceName,ZoneId) label_replace(label_replace(ops_aliyun_info_rds, "instanceId", "$1", "DBInstanceId", "(.*)"), "instanceName", "$1", "DBInstanceDescription", "(.*)") > 90
+    labels:
+      severity: warn
+    for: 5m
+    annotations:
+      summary: 'RDS: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId }} ZoneId: {{ $labels.ZoneId }}，内存使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: rds_DiskUsage
+    expr: |-
+      ops_aliyun_metric_acs_rds_dashboard_DiskUsage_Average * on (instanceId) group_left(instanceName,ZoneId) label_replace(label_replace(ops_aliyun_info_rds, "instanceId", "$1", "DBInstanceId", "(.*)"), "instanceName", "$1", "DBInstanceDescription", "(.*)") > 90
+    labels:
+      severity: warn
+    for: 5m
+    annotations:
+      summary: 'RDS: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId }} ZoneId: {{ $labels.ZoneId }}，磁盘使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: rds_IOPSUsage
+    expr: |-
+      ops_aliyun_metric_acs_rds_dashboard_IOPSUsage_Average * on (instanceId) group_left(instanceName,ZoneId) label_replace(label_replace(ops_aliyun_info_rds, "instanceId", "$1", "DBInstanceId", "(.*)"), "instanceName", "$1", "DBInstanceDescription", "(.*)") > 90
+    labels:
+      severity: warn
+    for: 3m
+    annotations:
+      summary: 'RDS: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId }} ZoneId: {{ $labels.ZoneId }}，IOPS使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: rds_ConnectionUsage
+    expr: |-
+      ops_aliyun_metric_acs_rds_dashboard_ConnectionUsage_Average * on (instanceId) group_left(instanceName,ZoneId) label_replace(label_replace(ops_aliyun_info_rds, "instanceId", "$1", "DBInstanceId", "(.*)"), "instanceName", "$1", "DBInstanceDescription", "(.*)") > 90
+    labels:
+      severity: warn
+    for: 3m
+    annotations:
+      summary: 'RDS: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId }} ZoneId: {{ $labels.ZoneId }}，连接数使用率大于90%，当前值为{{ $value }}%.'
+
+
+- name: redis
+  rules:
+  - alert: redis_StandardCpuUsage
+    expr: |-
+      ops_aliyun_metric_acs_kvstore_StandardCpuUsage_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_redis, "instanceId", "$1", "InstanceId", "(.*)"), "instanceName", "$1", "InstanceName", "(.*)") > 90
+    labels:
+      severity: warn
+    for: 5m
+    annotations:
+      summary: 'Redis: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId }}，CPU使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: redis_StandardMemoryUsage
+    expr: |-
+      ops_aliyun_metric_acs_kvstore_StandardMemoryUsage_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_redis, "instanceId", "$1", "InstanceId", "(.*)"), "instanceName", "$1", "InstanceName", "(.*)") > 90
+    labels:
+      severity: warn
+    for: 3m
+    annotations:
+      summary: 'Redis: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId }}，内存使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: redis_StandardQPSUsage
+    expr: |-
+      ops_aliyun_metric_acs_kvstore_StandardQPSUsage_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_redis, "instanceId", "$1", "InstanceId", "(.*)"), "instanceName", "$1", "InstanceName", "(.*)") > 90
+    labels:
+      severity: warn
+    for: 3m
+    annotations:
+      summary: 'Redis: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId }}，QPS使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: redis_StandardConnectionUsage
+    expr: |-
+      ops_aliyun_metric_acs_kvstore_StandardConnectionUsage_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_redis, "instanceId", "$1", "InstanceId", "(.*)"), "instanceName", "$1", "InstanceName", "(.*)") > 90
+    labels:
+      severity: warn
+    for: 3m
+    annotations:
+      summary: 'Redis: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId }}，连接数使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: redis_StandardMaxRt
+    expr: |-
+      ops_aliyun_metric_acs_kvstore_StandardMaxRt_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_redis, "instanceId", "$1", "InstanceId", "(.*)"), "instanceName", "$1", "InstanceName", "(.*)") > 1000000
+    labels:
+      severity: warn
+    for: 3m
+    annotations:
+      summary: 'Redis: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId }}，最大响应时间大于1s，当前值为{{ $value }}us.'
+
+  - alert: redis_StandardHitRate
+    expr: |-
+      ops_aliyun_metric_acs_kvstore_StandardHitRate_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_redis, "instanceId", "$1", "InstanceId", "(.*)"), "instanceName", "$1", "InstanceName", "(.*)") < 95
+    labels:
+      severity: error
+    for: 3m
+    annotations:
+      summary: 'Redis: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId }}，命中率小于95%，当前值为{{ $value }}.'
+
+
+- name: eip
+  rules:
+  - alert: eip_net_in.rate_percentage
+    expr: |-
+      ops_aliyun_metric_acs_vpc_eip_net_in_rate_percentage_Average * on (instanceId) group_left(IP) label_replace(label_replace(ops_aliyun_info_eip, "IP", "$1", "IpAddress", "(.*)"), "instanceId","$1", "AllocationId", "(.*)") > 90
+    for: 3m
+    labels:
+      severity: warn
+    annotations:
+      summary: "Eip: {{ $labels.IP }} instanceId: {{ $labels.instanceId }})，网络流入带宽利用率大于90%，当前值为{{ $value }}%."
+
+  - alert: eip_net_out.rate_percentage
+    expr: |-
+      ops_aliyun_metric_acs_vpc_eip_net_out_rate_percentage_Average * on (instanceId) group_left(IP) label_replace(label_replace(ops_aliyun_info_eip, "IP", "$1", "IpAddress", "(.*)"), "instanceId","$1", "AllocationId", "(.*)") > 90
+    for: 3m
+    labels:
+      severity: warn
+    annotations:
+      summary: "Eip: {{ $labels.IP }} instanceId: {{ $labels.instanceId }})，网络流出带宽利用率大于90%，当前值为{{ $value }}%."
+
+
+- name: kafka
+  rules:
+  - alert: kafka_instance_disk_capacity
+    expr: |-
+      ops_aliyun_metric_acs_kafka_instance_disk_capacity_Maximum * on (instanceId) group_left(instanceName, RegionId) label_replace(label_replace(ops_aliyun_info_kafka, "instanceId", "$1", "InstanceId", "(.*)"), "instanceName", "$1", "Name", "(.*)") > 90
+    labels:
+      severity: warn
+    for: 5m
+    annotations:
+      summary: 'Kafka: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId }} Region: {{ $labels.RegionId }}，实例磁盘使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: kafka_message_accumulation_onetopic
+    expr: |-
+      ops_aliyun_metric_acs_kafka_message_accumulation_onetopic_Value * on (instanceId) group_left(instanceName, RegionId) label_replace(label_replace(ops_aliyun_info_kafka, "instanceId", "$1", "InstanceId", "(.*)"), "instanceName", "$1", "Name", "(.*)") > 10000
+    labels:
+      severity: error
+    for: 3m
+    annotations:
+      summary: 'Kafka: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId }} Region: {{ $labels.RegionId }}，消费者组( {{ $labels.consumerGroup }} )未消费此Topic( {{ $labels.topic }} )的消息数大于10000，,当前值为{{ $value }}.'
+
+
+- name: elasticsearch
+  rules:
+  - alert: elasticsearch_ClusterStatus
+    expr: |-
+      ops_aliyun_metric_acs_elasticsearch_ClusterStatus_Value * on (clusterId) group_left(InstanceName) label_replace(label_replace(ops_aliyun_info_es, "instanceName","$1", "description", "(.*)"),"clusterId","$1", "instanceId", "(.*)") != 0
+    for: 3m
+    labels:
+      severity: error
+    annotations:
+      summary: 'ElasticSearch: {{ $labels.instanceName }}，集群状态为非正常状态，请及时处理，当前值为{{ $value }}.'
+
+  - alert: elasticsearch_NodeCPUUtilization
+    expr: |-
+      ops_aliyun_metric_acs_elasticsearch_NodeCPUUtilization_Average * on (clusterId) group_left(InstanceName) label_replace(label_replace(ops_aliyun_info_es, "instanceName","$1", "description", "(.*)"),"clusterId","$1", "instanceId", "(.*)") > 90
+    for: 5m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'ElasticSearch: {{ $labels.instanceName }} nodeIP: {{ $labels.nodeIP }} instanceId: {{ $labels.clusterId }}，节点CPU使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: elasticsearch_NodeDiskUtilization
+    expr: |-
+      ops_aliyun_metric_acs_elasticsearch_NodeDiskUtilization_Average * on (clusterId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_es, "instanceName","$1", "description", "(.*)"),"clusterId","$1", "instanceId", "(.*)") > 90
+    for: 5m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'ElasticSearch: {{ $labels.instanceName }} nodeIP: {{ $labels.nodeIP }} instanceId: {{ $labels.clusterId }}，节点磁盘使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: elasticsearch_NodeHeapMemoryUtilization
+    expr: |-
+      ops_aliyun_metric_acs_elasticsearch_NodeHeapMemoryUtilization_Average * on (clusterId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_es, "instanceName","$1", "description", "(.*)"),"clusterId","$1", "instanceId", "(.*)") > 90
+    for: 5m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'ElasticSearch: {{ $labels.instanceName }} nodeIP: {{ $labels.nodeIP }} instanceId: {{ $labels.clusterId }}，节点内存使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: elasticsearch_ClusterQueryQPS
+    expr: |-
+      ops_aliyun_metric_acs_elasticsearch_ClusterQueryQPS_Average * on (clusterId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_es, "instanceName","$1", "description", "(.*)"),"clusterId","$1", "instanceId", "(.*)") > 1000
+    for: 3m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'ElasticSearch: {{ $labels.instanceName }} instanceId: {{ $labels.clusterId }}，集群查询QPS大于1000，当前值为{{ $value }}.'
+
+  - alert: elasticsearch_ClusterIndexQPS
+    expr: |-
+      ops_aliyun_metric_acs_elasticsearch_ClusterIndexQPS_Average * on (clusterId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_es, "instanceName","$1", "description", "(.*)"),"clusterId","$1", "instanceId", "(.*)") > 10000
+    for: 3m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'ElasticSearch: {{ $labels.instanceName }} instanceId: {{ $labels.clusterId }}，集群写入QPS大于10000，当前值为{{ $value }}.'
+
+
+- name: mongodb
+  rules:
+  - alert: mongodb_CPUUtilization
+    expr: |-
+      ops_aliyun_metric_acs_mongodb_CPUUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(imou_aliyun_info_mongo, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 90
+    for: 5m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'Mongodb: {{ $labels.instanceName }} role: {{ $labels.role }}，CPU使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: mongodb_MemoryUtilization
+    expr: |-
+      ops_aliyun_metric_acs_mongodb_MemoryUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(imou_aliyun_info_mongo, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 90
+    for: 5m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'Mongodb: {{ $labels.instanceName }} role: {{ $labels.role }}，内存使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: mongodb_ConnectionUtilization
+    expr: |-
+      ops_aliyun_metric_acs_mongodb_ConnectionUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(imou_aliyun_info_mongo, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 90
+    for: 5m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'Mongodb: {{ $labels.instanceName }} role: {{ $labels.role }}，连接数使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: mongodb_DiskUtilization
+    expr: |-
+      ops_aliyun_metric_acs_mongodb_DiskUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(imou_aliyun_info_mongo, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 90
+    for: 5m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'Mongodb: {{ $labels.instanceName }} role: {{ $labels.role }}，磁盘使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: mongodb_IOPSUtilization
+    expr: |-
+      ops_aliyun_metric_acs_mongodb_IOPSUtilization_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(imou_aliyun_info_mongo, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 90
+    for: 5m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'Mongodb: {{ $labels.instanceName }} role: {{ $labels.role }}，IOPS使用率大于90%，当前值为{{ $value }}%.'
+
+  - alert: mongodb_ReplicationLag
+    expr: |-
+      ops_aliyun_metric_acs_mongodb_ReplicationLag_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(imou_aliyun_info_mongo, "instanceName","$1", "DBInstanceDescription", "(.*)"), "instanceId","$1", "DBInstanceId", "(.*)") > 10
+    for: 5m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'Mongodb: {{ $labels.instanceName }} role: {{ $labels.role }}，复制延迟大于10s，当前值为{{ $value }}s.'
+
+
+- name: dts
+  rules:
+  - alert: dts_MigrationLatency
+    expr: |-
+      ops_aliyun_metric_acs_dts_MigrationLatency_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_dts_migrate, "instanceName","$1", "MigrationJobName", "(.*)"), "instanceId","$1", "MigrationJobID", "(.*)") > 10
+    for: 5m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'dts_migrate: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId }}，迁移延迟大于10s，当前值为{{ $value }}s.'
+
+  - alert: dts_SynchronizationLatency
+    expr: |-
+      ops_aliyun_metric_acs_dts_SynchronizationLatency_Average * on (instanceId) group_left(instanceName) label_replace(label_replace(ops_aliyun_info_dts_sync, "instanceName","$1", "SynchronizationJobName", "(.*)"), "instanceId","$1", "SynchronizationJobId", "(.*)") > 5000
+    for: 5m
+    labels:
+      severity: warn
+    annotations:
+      summary: 'dts_sync: {{ $labels.instanceName }} instanceId: {{ $labels.instanceId }}，同步延迟大于5s，当前值为{{ $value }}Milliseconds.'

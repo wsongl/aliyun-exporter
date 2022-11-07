@@ -1,0 +1,315 @@
+ak: xxx
+sk: xxx
+
+project: "ops"
+
+# 采集时间范围，从现在开始，往前推period时间，这段时间内的数据
+# 单位：秒，默认60，最好60倍数，具体请参考阿里云文档
+period: 60
+
+# 统计维度，指标（metric）监控值的维度，常有Average、Minimum、Maximum、Sum、Value
+# https://help.aliyun.com/document_detail/162844.htm
+statistic: Average
+
+# 接入地址 https://help.aliyun.com/document_detail/28616.html
+# 默认采用国内的接入地址
+endpoint: metrics.aliyuncs.com
+
+# 地域：https://help.aliyun.com/document_detail/188196.html
+regions:
+  - cn-hangzhou     # 杭州
+  - cn-shanghai     # 上海
+  # - cn-shenzhen     # 深圳
+  # - cn-hongkong     # 香港
+  # - ap-southeast-1  # 新加坡
+  # - ap-southeast-2  # 悉尼
+  # - ap-south-1      # 孟买
+  # - ap-northeast-1  # 东京
+  # - ap-northeast-2  # 首尔
+  # - us-east-1       # 弗吉尼亚
+  # - eu-central-1    # 法兰克福
+  # - eu-west-1       # 伦敦
+  # - me-east-1       # 迪拜
+
+# 实现了以下服务的实例信息采集，服务名字段名如下（不可更改），因为alicloud.py中有强依赖；
+# Tip: 阿里云有些地区没有开通的服务（如首尔没有es产品），配置会有连接错误，需要运维人员配置精确区域；
+# Tip: ecs功能实现了，但由于ecs每次只能取100台机器，这是很慢的，不建议用此exporter采集ecs指标，但量少时，如几百台就无所谓；
+#
+# servies中regions的具体使用方法，regions和services的配置如下
+# regions:
+#   - cn-hangzhou
+#   - cn-shanghai
+# 
+# services:
+#   - name: rds
+#     regions:
+#       - cn-hongkong+
+#       - cn-shanghai-
+# 最终结果，通过这样匹配，可以精确调用资源所在区域：
+# services:
+#   - name: rds
+#     regions:
+#       - cn-hangzhou
+#       - cn-hongkong
+services:
+  - name: ecs
+    regions:
+      - ap-southeast-1+
+      - cn-shanghai-
+  - name: clb  # 原slb
+  - name: rds
+  - name: redis
+  - name: eip
+  - name: oss
+  - name: kafka
+  - name: mongo
+  - name: rocketmq
+  - name: elasticsearch
+  - name: dts_sync
+  - name: dts_migrate
+  - name: nat_gateway
+
+# 监控指标：https://help.aliyun.com/document_detail/163515.html
+metrics:
+  # acs_ecs_dashboard:
+  #   - name: CPUUtilization                        # （ECS）CPU使用率 %
+  #   - name: DiskReadIOPS                          # （ECS）所有磁盘每秒读取次数 Count/Second
+  #   - name: DiskWriteIOPS                         # （ECS）所有磁盘每秒写入次数 Count/Second
+  #   - name: IntranetInRate                        # （ECS）内网流入带宽 bit/s
+  #   - name: IntranetOutRate                       # （ECS）内网流出带宽 bit/s
+  #   - name: VPC_PublicIP_InternetInRate           # （ECS）IP维度公网流入带宽
+  #   - name: VPC_PublicIP_InternetOutRate          # （ECS）IP维度公网流出带宽
+  #   - name: VPC_PublicIP_InternetOutRate_Percent  # （ECS）IP维度公网流出带宽使用率
+  #   - name: eip_InternetInRate                    # （EIP）EIP实例维度流入带宽 bit/s
+  #     statistic: Value
+  #   - name: eip_InternetOutRate                   # （EIP）EIP实例维度流出带宽 bit/s
+  #     statistic: Value
+  #   - name: packetInDropRates                     # （ECS）入方向丢包率 %
+  #     statistic: Maximum
+  #   - name: packetOutDropRates                    # （ECS）出方向丢包率 %
+  #     statistic: Maximum
+  #   - name: load_1m                 # 1分钟负载
+  #   - name: load_5m                 # 5分钟负载
+  #   - name: memory_usedutilization  # %
+  #   - name: memory_totalspace       # Byte
+  #   - name: memory_usedspace        # Byte
+  #   - name: cpu_idle                # cpu idle
+
+  # rds mysql版监控项为参考
+  acs_rds_dashboard:
+    - name: ConnectionUsage        # 连接数使用率 %
+    - name: CpuUsage               # CPU使用率 %
+    - name: MemoryUsage            # 内存使用率 %
+    - name: DiskUsage              # 磁盘使用率 %
+    - name: MySQL_DataDiskSize     # 数据磁盘使用量 MB
+    - name: DataDelay              # 只读实例延迟 Second
+    - name: IOPSUsage              # iops使用率 %
+    - name: MySQL_ActiveSessions   # Session数量 Count
+    - name: MySQL_ThreadsConnected # 线程连接数 Count
+    - name: MySQL_ThreadsRunning   # 活跃线程数 Count
+    - name: MySQL_SlowQueries      # 每秒慢查询量 CountSecond
+    - name: MySQL_TPS              # 每秒事务数 CountSecond
+    - name: MySQL_QPS              # 每秒查询量 CountSecond
+    - name: MySQL_NetworkInNew     # 入网带宽 bit/s
+    - name: MySQL_NetworkOutNew    # 出网带宽 bit/s
+    - name: MySQL_IbufRequestR     # 每秒逻辑读次数 CountSecond
+    - name: MySQL_IbufRequestW     # 每秒逻辑写次数 CountSecond
+    - name: MySQL_IbufDirtyRatio   # BP脏页百分率 %
+    - name: MySQL_IbufReadHit      # BP读命中率 %
+
+  acs_kvstore:
+    # 标准版redis监控项为参考
+    - name: StandardAvgRt             # 平均响应时间 us
+    - name: StandardConnectionUsage   # 连接数使用率 %
+    - name: StandardCpuUsage          # CPU使用率 %
+    - name: StandardFailedCount       # 命令失败次数 Count/Second
+    - name: StandardHitRate           # 命中率 %
+    - name: StandardIntranetIn        # 入方向流量 bit/s
+    - name: StandardIntranetOut       # 出方向流量 bit/s
+    - name: StandardIntranetInRatio   # 流入带宽使用率 %
+    - name: StandardIntranetOutRatio  # 流出带宽使用率 %
+    - name: StandardKeys              # 缓存内Key数量 个
+    - name: StandardMaxRt             # 最大响应时间 us
+    - name: StandardMemoryUsage       # 内存使用率 %
+    - name: StandardQPSUsage          # QPS使用率 %
+    - name: StandardUsedConnection    # 已用连接数 个
+    - name: StandardUsedMemory        # 内存使用量 Byte
+    - name: StandardUsedQPS           # 平均每秒访问次数 个
+    - name: StandardSyncDelayTime     # 数据同步时延 Second
+
+    # 集群版redis监控项为参考
+    - name: ShardingAvgRt             # 平均响应时间 us
+    - name: ShardingConnectionUsage   # 连接数使用率 %
+    - name: ShardingCpuUsage          # CPU使用率 %
+    - name: ShardingHitRate           # 命中率 %
+    - name: ShardingIntranetIn        # 入方向流量 bit/s
+    - name: ShardingIntranetOut       # 出方向流量 bit/s
+    - name: ShardingIntranetInRatio   # 流入带宽使用率 %
+    - name: ShardingIntranetOutRatio  # 流出带宽使用率 %
+    - name: ShardingKeys              # 缓存内Key数量 个
+    - name: ShardingMaxRt             # 最大响应时间 us
+    - name: ShardingMemoryUsage       # 内存使用率 %
+    - name: ShardingQPSUsage          # QPS使用率 %
+    - name: ShardingUsedConnection    # 已用连接数 个
+    - name: ShardingUsedMemory        # 内存使用量 Byte
+    - name: ShardingUsedQPS           # 平均每秒访问次数 个
+    - name: ShardingSyncDelayTime     # 数据同步时延 Second
+    - name: ShardingProxyAvgRt        # Proxy平均时延 us
+    - name: ShardingProxyUsedConnection   # Proxy已使用连接数 Count
+    - name: ShardingProxyConnectionUsage  # Proxy连接数使用率 %
+    - name: ShardingProxyCpuUsage     # Proxy CPU使用率 %
+    - name: ShardingProxyMaxRt        # Proxy最大时延 us
+
+  # clb（原slb）监控项为参考
+  acs_slb_dashboard:
+    - name: ActiveConnection     # TCP每秒活跃连接数 Count
+    - name: InactiveConnection   # TCP非活跃连接数 Count
+    - name: InstanceActiveConnection           # 实例每秒活跃连接数 Count/s
+    - name: InstanceInactiveConnection         # 实例每秒非活跃连接数 Count/s
+    - name: InstanceMaxConnection              # 实例每秒最大并发连接数Count/s
+    - name: InstanceMaxConnectionUtilization   # 实例最大连接数使用率 %
+    - name: InstanceNewConnection              # 实例每秒新建连接数 Count/s
+    - name: InstanceNewConnectionUtilization   # 实例新建连接数使用率 %
+    - name: InstanceQps                        # 七层实例QPS Count/s
+    - name: InstanceQpsUtilization             # 七层实例QPS使用率 %
+    - name: InstanceTrafficTXUtilization       # 实例网络流出带宽使用率 %
+    - name: MaxConnection                      # 端口并发连接数 Count/Second
+    - name: NewConnection                      # TCP新建连接数 Count
+    - name: Qps                                # 七层监听QPS Count/s
+    - name: TrafficRXNew                       # 流入带宽 bit/s
+    - name: TrafficTXNew                       # 流出带宽 bit/s
+    - name: InstanceTrafficRX                  # 实例每秒入bit数 bit/s
+    - name: InstanceTrafficTX                  # 实例每秒出bit数 bit/s
+    - name: HeathyServerCount                  # 健康检查后端健康ECS实例个数 Count
+    - name: UnhealthyServerCount               # 后端异常ECS实例个数 Count
+    - name: HealthyServerCountWithRule         # 七层转发规则后端健康ECS实例个数 Count
+    - name: UnhealthyServerCountWithRule       # 七层转发规则后端异常ECS实例个数 Count
+
+  acs_vpc_eip:
+    - name: in_ratelimit_drop_speed     # 入方向限速丢包速率 Packet/Second
+    - name: out_ratelimit_drop_speed    # 出方向限速丢包速率 Packet/Second
+    - name: net_rx.rate                 # 网络流入带宽 bit/s
+      statistic: Value
+    - name: net_tx.rate                 # 网络流出带宽 bit/s
+      statistic: Value
+    - name: net_in.rate_percentage      # 网络流入带宽利用率 Value
+    - name: net_out.rate_percentage     # 网络流出带宽利用率 Value
+
+  acs_kafka:
+    - name: instance_disk_capacity          # 实例磁盘使用率 %
+      statistic: Maximum
+    - name: instance_message_input          # 实例消息生产量 Byte/s
+      statistic: Value
+    - name: instance_message_output         # 实例消息消费量 Byte/s
+      statistic: Value
+    - name: instance_message_num_input      # 实例消息生产条数 CountS
+      statistic: Value
+    - name: instance_message_num_output     # 实例消息消费条数 CountS
+      statistic: Value
+    - name: message_accumulation            # 消息堆积量 Count
+      statistic: Value
+    - name: message_accumulation_onetopic   # ConsumerGroup未消费此Topic消息数（个） Count
+      statistic: Value
+    - name: topic_message_input             # Topic消息生产量 Byte/s
+      statistic: Value
+    - name: topic_message_output            # Topic消息消费量 Byte/s
+      statistic: Value
+    - name: topic_message_num_input         # Topic消息生产条数 CountS
+      statistic: Value
+    - name: topic_message_num_output        # Topic消息消费条数 CountS
+      statistic: Value
+
+  acs_elasticsearch:
+    - name: ClusterAutoSnapshotLatestStatus # 快照状态 Value
+      statistic: Maximum
+    - name: ClusterStatus                   # 集群状态 Value
+      statistic: Value
+    - name: ClusterIndexQPS                 # 集群写入QPS Count/Second
+    - name: ClusterQueryQPS                 # 集群查询QPS Count/Second
+    - name: NodeCPUUtilization              # Elasticsearch实例节点CPU使用率
+    - name: NodeDiskUtilization             # Elasticsearch实例节点磁盘使用率
+    - name: NodeHeapMemoryUtilization       # Elasticsearch实例节点HeapMemory使用率
+    - name: NodeLoad_1m                     # 节点Load_1m
+    - name: NodeStatsDataDiskUtil           # IOUtil %
+      statistic: Maximum
+    - name: NodeStatsExceptionLogCount      # Exception次数 Count
+      statistic: Maximum
+    - name: NodeStatsFullGcCollectionCount  # FullGc次数 Count
+      statistic: Maximum
+    - name: NodeStatsNetworkinRate          # 数据流入率 KB/s
+      statistic: Maximum
+    - name: NodeStatsNetworkoutRate         # 数据流出率 KB/s
+      statistic: Maximum
+    - name: NodeStatsDataDiskR              # 每秒完成的读请求数量 Count
+      statistic: Maximum
+    - name: NodeStatsDataDiskW              # 每秒完成的写请求数量 Count
+      statistic: Maximum
+    - name: NodeStatsDataDiskRm             # 每秒钟读取的大小 MB/s
+      statistic: Maximum
+    - name: NodeStatsDataDiskWm             # 每秒钟写入的大小 MB/s
+      statistic: Maximum
+
+  acs_oss_dashboard:
+    - name: MeteringStorageUtilization  # 存储大小 Byte
+      period: 3600                      # 周期至少为3600秒，或者其整数倍
+      statistic: Value
+    - name: InternetRecv                # 公网流入流量 Byte
+      statistic: Value
+    - name: InternetSend                # 公网流出流量 Byte
+      statistic: Value
+    - name: IntranetRecv                # 内网流入流量 Byte 
+      statistic: Value
+    - name: IntranetSend                # 内网流出流量 Byte
+      statistic: Value
+    - name: Availability                # 可用性 %
+      statistic: Value
+    - name: SuccessRate                 # 成功请求占比 %
+      statistic: Value
+
+  # MongoDB版-副本集监控项为参考
+  acs_mongodb:
+    - name: CPUUtilization         # （副本集）CPU使用率 %
+    - name: MemoryUtilization      # （副本集）内存使用百分比 %
+    - name: ConnectionAmount       # （副本集）连接数使用量 Count
+    - name: ConnectionUtilization  # （副本集）连接数使用率 %
+    - name: DataDiskAmount         # （副本集）数据占用磁盘空间量 Byte
+    - name: DiskUtilization        # （副本集）磁盘使用率 %
+    - name: IOPSUtilization        # （副本集）IOPS使用率 %
+    - name: IntranetIn             # （副本集）内网网络入流量 Byte
+    - name: IntranetOut            # （副本集）内网网络出流量 Byte
+    - name: QPS                    # （副本集）每秒请求数 Count
+    - name: ReplicationLag         # （副本集）复制延迟 Seconds
+
+  acs_dts:
+    - name: MigrationLatency        # 迁移延迟 Seconds
+    - name: SynchronizationLatency  # 同步延迟 Milliseconds
+
+  acs_nat_gateway:
+    - name: SessionActiveConnection            # 并发连接数 CountS
+      statistic: Value
+    - name: SessionActiveConnectionWaterLever  # 并发连接水位 %
+      statistic: Value
+    - name: SessionLimitDropConnection         # 并发超规格丢弃速率 CountS
+      statistic: Value
+    - name: SessionNewConnectionWaterLever     # 新建连接水位 %
+      statistic: Value
+    - name: SessionNewLimitDropConnection      # 新建超规格丢弃速率 CountS
+      statistic: Value
+
+  acs_rocketmq:
+    - name: ThrottledSendRequestsPerTopic      # 每分钟（Topic）发送被限流次数
+      statistic: Sum
+    - name: ThrottledReceiveRequestsPerGidTopic  # 每分钟（GroupId&Topic）消费被限流次数
+      statistic: Sum
+    - name: SendMessageCountPerTopic           # 生产者每分钟发送消息数量（Topic）
+      statistic: Sum
+    - name: ReceiveMessageCountPerGidTopic     # 消费者每分钟接收消息数量（Group&Topic）
+      statistic: Sum
+    - name: SendDLQMessageCountPerGidTopic     # 每分钟产生死信消息的数量（Group&Topic）
+      statistic: Sum
+    - name: ConsumerLagPerGidTopic             # 消息堆积量（Group&Topic） count
+      statistic: Sum
+    - name: ConsumerLagLatencyPerGidTopic      # 消息处理延迟时间（GroupId&Topic） millisecond
+      statistic: Maximum
+    - name: InstanceApiCallTps                 # 实例API调用频率（Instance） countSecond
+      statistic: Sum
